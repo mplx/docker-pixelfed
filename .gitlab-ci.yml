@@ -1,0 +1,124 @@
+cache: &cache
+   untracked: false
+
+.tags-defaults-docker: &tags-defaults-docker
+  - shared
+
+.semver-regex: &semver-regex /^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9a-zA-Z.-]+))?$/
+
+variables:
+  TEMP_IMAGE: ci-build/$CI_PROJECT_PATH:$CI_PIPELINE_ID
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: docker:latest
+  tags:
+    - docker-build
+  only:
+    - *semver-regex
+    - master
+  variables:
+    GIT_STRATEGY: clone
+    GIT_SUBMODULE_STRATEGY: recursive
+  services:
+    - name: $CI_REGISTRY/docker/dind:latest
+      alias: docker
+  script:
+    - echo "$CI_COMMIT_SHA" > ./BUILD && date >> ./BUILD
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker pull $CI_REGISTRY_IMAGE:master || true
+    - docker build --cache-from $CI_REGISTRY_IMAGE:master --build-arg CI_REGISTRY=$CI_REGISTRY --pull --tag $TEMP_IMAGE .
+    - docker tag $TEMP_IMAGE $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker tag $TEMP_IMAGE $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE
+
+#deploy -- docker must have (d)irect (a)ccess to (r)egistry
+.deploy-dar: &deploy-dar
+  stage: deploy
+  image: docker:latest
+  tags:
+    - docker-deploy
+  variables: &deploy-dar-variables
+    GIT_STRATEGY: none
+    DEPLOY_DOCKER_HOST: $DAR_DOCKER_HOST
+    DEPLOY_DOCKER_CA: $DAR_DOCKER_CA
+    DEPLOY_DOCKER_CERT: $DAR_DOCKER_CERT
+    DEPLOY_DOCKER_KEY: $DAR_DOCKER_KEY
+  dependencies: []
+  services:
+    - name: $CI_REGISTRY/docker/dind:latest
+      alias: docker
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - mkdir -p ~/.docker
+    - export DOCKER_TLS_VERIFY=1
+    - export DOCKER_HOST=$DEPLOY_DOCKER_HOST
+    - echo "$DEPLOY_DOCKER_CA" > ~/.docker/ca.pem
+    - echo "$DEPLOY_DOCKER_CERT" > ~/.docker/cert.pem
+    - echo "$DEPLOY_DOCKER_KEY" > ~/.docker/key.pem
+    - docker service update --with-registry-auth --image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $DEPLOY_DOCKER_SERVICENAME --force
+    - '[ `docker service ls --format ''{{.Replicas}}'' --filter "name=$DEPLOY_DOCKER_SERVICENAME" | awk ''{split($0,a,"/"); print a[1]}''` -gt 0 ]'
+
+#deploy -- docker has (n)o (d)irect (a)ccess to (r)egistry
+.deploy-ndar: &deploy-ndar
+  stage: deploy
+  image: docker:latest
+  tags:
+    - docker-deploy
+  variables: &deploy-ndar-variables
+    GIT_STRATEGY: none
+    DEPLOY_DOCKER_HOST: $NDAR_DOCKER_HOST
+    DEPLOY_DOCKER_CA: $NDAR_DOCKER_CA
+    DEPLOY_DOCKER_CERT: $NDAR_DOCKER_CERT
+    DEPLOY_DOCKER_KEY: $NDAR_DOCKER_KEY
+  dependencies: []
+  services:
+    - name: $CI_REGISTRY/docker/dind:latest
+      alias: docker
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker save --output image.tar $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - mkdir -p ~/.docker
+    - export DOCKER_TLS_VERIFY=1
+    - export DOCKER_HOST=$DEPLOY_DOCKER_HOST
+    - echo "$DEPLOY_DOCKER_CA" > ~/.docker/ca.pem
+    - echo "$DEPLOY_DOCKER_CERT" > ~/.docker/cert.pem
+    - echo "$DEPLOY_DOCKER_KEY" > ~/.docker/key.pem
+    - docker load --input image.tar --quiet
+    - docker service update --image $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $DEPLOY_DOCKER_SERVICENAME --force
+    - '[ `docker service ls --format ''{{.Replicas}}'' --filter "name=$DEPLOY_DOCKER_SERVICENAME" | awk ''{split($0,a,"/"); print a[1]}''` -gt 0 ]'
+
+deploy-testing:
+  <<: *deploy-dar
+  only:
+    - master
+  when: manual
+  dependencies:
+    - build
+  variables:
+    <<: *deploy-ndar-variables
+    DEPLOY_DOCKER_HOST: $TESTING_DOCKER_HOST
+    DEPLOY_DOCKER_CA: $TESTING_DOCKER_CA
+    DEPLOY_DOCKER_CERT: $TESTING_DOCKER_CERT
+    DEPLOY_DOCKER_KEY: $TESTING_DOCKER_KEY
+    DEPLOY_DOCKER_SERVICENAME: $TESTING_DOCKER_SERVICENAMES
+
+deploy-production:
+  <<: *deploy-dar
+  only:
+    - master
+  when: manual
+  dependencies:
+    - build
+  variables:
+    <<: *deploy-ndar-variables
+    DEPLOY_DOCKER_HOST: $PRODUCTION_DOCKER_HOST
+    DEPLOY_DOCKER_CA: $PRODUCTION_DOCKER_CA
+    DEPLOY_DOCKER_CERT: $PRODUCTION_DOCKER_CERT
+    DEPLOY_DOCKER_KEY: $PRODUCTION_DOCKER_KEY
+    DEPLOY_DOCKER_SERVICENAME: $PRODUCTION_DOCKER_SERVICENAMES

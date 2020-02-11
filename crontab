@@ -1,0 +1,1 @@
+* * * * * su -c "cd /home/project/pixelfed/ && php artisan schedule:run 2>&1" project
