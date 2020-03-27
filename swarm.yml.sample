@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  app:
+    image: mplx/pixelfed:latest
+    networks:
+      - internal
+      - proxy
+    env_file:
+      - ./pixelfed.env
+    volumes:
+      - /cloud/pixelfed/data:/home/project/pixelfed/storage
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.port=8000"
+        - "traefik.backend=pixelfed"
+        - "traefik.frontend.rule=Host:pixelfed.example.com"
+        - "traefik.enable=true"
+        - "traefik.frontend.entryPoints=https"
+        - "traefik.docker.network=proxy"
+        - "traefik.backend.loadbalancer.method=drr"
+  mysql:
+    image: mysql:5.7
+    networks:
+      - internal
+    env_file: ./mysql.env
+    volumes:
+      - /cloud/pixelfed/mysql:/var/lib/mysql
+  redis:
+    image: redis:4-alpine
+    networks:
+      - internal
+    volumes:
+      - /cloud/pixelfed/redis:/data
+networks:
+  proxy:
+    external: true
+  internal:
