@@ -1,0 +1,21 @@
+image: mplx/docker-pixelfed:master
+manifests:
+  - image: mplx/docker-pixelfed:master-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: mplx/docker-pixelfed:master-arm32v6
+    platform:
+      architecture: arm
+      os: linux
+      variant: v6
+  - image: mplx/docker-pixelfed:master-arm32v7
+    platform:
+      architecture: arm
+      os: linux
+      variant: v7
+  - image: mplx/docker-pixelfed:master-arm64v8
+    platform:
+      architecture: arm64
+      os: linux
+      variant: v8
