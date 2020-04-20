@@ -1,6 +1,6 @@
 # pixelfed in a alpine linux based docker container
 
-[pixelfed](https://github.com/pixelfed/pixelfed) is photo sharing for everydone by [dansup](https://github.com/dansup).
+[pixelfed](https://github.com/pixelfed/pixelfed) is photo sharing for everyone by [dansup](https://github.com/dansup).
 
 Supports amd64, arm32v6, arm32v7, arm32v8.
 

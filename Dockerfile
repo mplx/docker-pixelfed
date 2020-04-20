@@ -1,6 +1,6 @@
 FROM mplx/alpine311-php73:latest
 
-ENV PIXELFED="v0.10.8" \
+ENV PIXELFED="v0.10.9" \
     TZ="Europe/Berlin" \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
@@ -50,7 +50,8 @@ RUN git clone --branch ${PIXELFED} --depth 1 https://github.com/pixelfed/pixelfe
     composer require --update-no-dev symfony/polyfill-iconv && \
     COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --no-progress --optimize-autoloader --no-interaction && \
     mv storage storage.tpl && \
-    rm .env.example.docker && \
+    rm .env.example && \
+    rm .env.docker && \
     rm .env.testing && \
     chown -R project:project /home/project
 
