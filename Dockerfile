@@ -40,7 +40,8 @@ RUN set -xe && \
     sed -i 's|;opcache.validate_timestamps=1|opcache.validate_timestamps=0|' /etc/php7/php.ini && \
     sed -i 's|;opcache.interned_strings_buffer=8|opcache.interned_strings_buffer=16|' /etc/php7/php.ini && \
     sed -i 's|post_max_size = 8M|post_max_size = 64M|' /etc/php7/php.ini && \
-    sed -i 's|upload_max_filesize = 2M|upload_max_filesize = 128M|' /etc/php7/php.ini
+    sed -i 's|upload_max_filesize = 2M|upload_max_filesize = 128M|' /etc/php7/php.ini && \
+    sed -i 's|;clear_env = no|clear_env = no|' /etc/php7/php-fpm.d/www.conf
 
 WORKDIR /home/project/pixelfed
 
