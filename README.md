@@ -16,7 +16,7 @@ Currently the Docker image is just available for master development tree: `docke
 - MultiArch (supports amd64, arm32v6, arm32v7 and arm32v8; however just amd64 is *extensively* tested)
 
 Additional services required:
-- [Database](https://docs.pixelfed.org/technical-documentation/env.html#database-configuration) (MySQL/MariaDB, PostgreSQL or SQLite)
+- [Database](https://docs.pixelfed.org/technical-documentation/env.html#database-configuration) (MySQL 5.6+/MariaDB 10.2.7+, PostgreSQL 10+)
 - [Redis](https://docs.pixelfed.org/technical-documentation/env.html#redis-configuration)
 
 See sample configuration for usage:
