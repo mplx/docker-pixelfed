@@ -11,7 +11,7 @@ FROM $REGISTRY_PATH/alpine311-php73:latest-arm32v7
 
 COPY --from=builder qemu-arm-static /usr/bin
 
-ENV PIXELFED="v0.10.9" \
+ENV PIXELFED="v0.10.10" \
     TZ="Europe/Berlin" \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
@@ -44,7 +44,7 @@ RUN set -xe && \
     setup-nginx.sh symfony4 /home/project/pixelfed/public && \
     sed -i 's|listen 80;|listen 8000;|' /etc/nginx/conf.d/default.conf && \
     sed -i -e '/blockdot.conf/s/^#*/#/' -i /etc/nginx/conf.d/default.conf && \
-    sed -i -e 's/^memory_limit =.*/memory_limit = 2048M/' /etc/php7/php.ini && \
+    sed -i -e 's/^memory_limit =.*/memory_limit = 3072M/' /etc/php7/php.ini && \
     sed -i '/docker_realip/s/#//' /etc/nginx/conf.d/default.conf && \
     sed -i 's|;opcache.memory_consumption=128|opcache.memory_consumption=64|' /etc/php7/php.ini && \
     sed -i 's|;opcache.max_accelerated_files=10000|opcache.max_accelerated_files=1000|' /etc/php7/php.ini && \
@@ -52,7 +52,8 @@ RUN set -xe && \
     sed -i 's|;opcache.interned_strings_buffer=8|opcache.interned_strings_buffer=16|' /etc/php7/php.ini && \
     sed -i 's|post_max_size = 8M|post_max_size = 64M|' /etc/php7/php.ini && \
     sed -i 's|upload_max_filesize = 2M|upload_max_filesize = 128M|' /etc/php7/php.ini && \
-    sed -i 's|;clear_env = no|clear_env = no|' /etc/php7/php-fpm.d/www.conf
+    sed -i 's|;clear_env = no|clear_env = no|' /etc/php7/php-fpm.d/www.conf && \
+    composer self-update
 
 WORKDIR /home/project/pixelfed
 
