@@ -27,8 +27,8 @@ Optional services:
   - [Reverse Proxy](https://github.com/mplx/docker-pixelfed/issues/3#issuecomment-624343083) to provide HTTPS
 
 See sample configuration for usage:
-  - [mysql.env.sample](./mysql.env.sample)
-  - [pixelfed.env.sample](./pixelfed.env.sample)
-  - [swarm.yml.sample](./swarm.yml.sample)
+  - [mysql.env.sample](https://raw.githubusercontent.com/mplx/docker-pixelfed/master/mysql.env.sample)
+  - [pixelfed.env.sample](https://raw.githubusercontent.com/mplx/docker-pixelfed/master/pixelfed.env.sample) (see [official docs](https://docs.pixelfed.org/running-pixelfed/installation.html#configure-environment-variables))
+  - [swarm.yml.sample](https://raw.githubusercontent.com/mplx/docker-pixelfed/master/swarm.yml.sample) (example for use in combination with traefik 1.x proxy)
 
 Please feel free to [submit an issue](https://github.com/mplx/docker-pixelfed/issues/new) or merge request regarding this project anytime :) however please respect that I cannot provide basic support for Docker/Swarm/k8s nor Pixelfed.

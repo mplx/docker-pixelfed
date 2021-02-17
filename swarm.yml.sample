@@ -28,7 +28,7 @@ services:
     volumes:
       - /cloud/pixelfed/mysql:/var/lib/mysql
   redis:
-    image: redis:4-alpine
+    image: redis:6-alpine
     networks:
       - internal
     volumes:
