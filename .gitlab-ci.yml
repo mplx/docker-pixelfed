@@ -34,7 +34,7 @@ build:
     - docker build --cache-from $CI_REGISTRY_IMAGE:master --build-arg CI_REGISTRY=$CI_REGISTRY --pull --tag $TEMP_IMAGE .
     - docker tag $TEMP_IMAGE $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
     - docker tag $TEMP_IMAGE $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE
+    - docker push --all-tags $CI_REGISTRY_IMAGE
 
 #deploy -- docker must have (d)irect (a)ccess to (r)egistry
 .deploy-dar: &deploy-dar
