@@ -84,6 +84,7 @@ function initialize() {
     su -c "php artisan config:cache" project
     su -c "php artisan route:cache" project
     su -c "php artisan view:cache" project
+    su -c "php artisan instance:actor" project
 
     echo "Pixelfed ${PIXELFED} ready..."
 }
