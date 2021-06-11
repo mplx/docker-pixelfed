@@ -1,6 +1,6 @@
 FROM mplx/alpine311-php73:latest
 
-ENV PIXELFED="v0.10.10" \
+ENV PIXELFED="v0.11.0" \
     TZ="Europe/Berlin" \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \

@@ -13,7 +13,7 @@ Currently the docker image is just available for the master development tree: `d
 [pixelfed](https://github.com/pixelfed/pixelfed) is a [federated](https://fediverse.party/) [Instagram](https://www.instagram.com/about/us/)-like photo sharing for everyone developed by [@dansup](https://github.com/dansup). This project puts this [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software) in a docker container.
 
 Container:
-  - Pixelfed [v0.10.10](https://github.com/pixelfed/pixelfed/releases)
+  - Pixelfed [v0.11.0](https://github.com/pixelfed/pixelfed/releases)
   - Based on [Alpine Linux 3.11 w/ PHP 7.3](https://hub.docker.com/r/gmitirol/alpine311-php73)
   - Source available at [Github](https://github.com/mplx/docker-pixelfed)
   - Autobuild at [DockerHub](https://hub.docker.com/r/mplx/docker-pixelfed)
