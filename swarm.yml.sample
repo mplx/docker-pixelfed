@@ -9,7 +9,7 @@ services:
     env_file:
       - ./pixelfed.env
     volumes:
-      - /cloud/pixelfed/data:/home/project/pixelfed/storage
+      - ./data:/home/project/pixelfed/storage
     deploy:
       replicas: 1
       labels:
@@ -20,19 +20,22 @@ services:
         - "traefik.frontend.entryPoints=https"
         - "traefik.docker.network=proxy"
         - "traefik.backend.loadbalancer.method=drr"
+
   mysql:
     image: mysql:5.7
     networks:
       - internal
     env_file: ./mysql.env
     volumes:
-      - /cloud/pixelfed/mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
+
   redis:
     image: redis:6-alpine
     networks:
       - internal
     volumes:
-      - /cloud/pixelfed/redis:/data
+      - ./redis:/data
+
 networks:
   proxy:
     external: true

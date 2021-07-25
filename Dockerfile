@@ -27,8 +27,7 @@ RUN set -xe && \
     ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
     apk add --no-cache --update git mysql-client jpegoptim optipng pngquant && \
     rm -rf /var/cache/apk/* && \
-    php-ext.sh enable 'bcmath curl exif gd imagick intl fileinfo pcntl' && \
-    php-ext.sh enable 'pdo mysqlnd pdo_mysql' && \
+    php-ext.sh enable 'bcmath curl exif gd imagick intl fileinfo pcntl pdo' && \
     php-ext.sh enable 'opcache apcu ldap session' && \
     setup-nginx.sh symfony4 /home/project/pixelfed/public && \
     sed -i 's|listen 80;|listen 8000;|' /etc/nginx/conf.d/default.conf && \

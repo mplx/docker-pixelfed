@@ -13,42 +13,48 @@ function waitdb() {
 
     # set default values
     if [ -z "${DB_CONNECTION}" ]; then
+        echo "Setting default for DB_CONNECTION: mysql"
         export DB_CONNECTION='mysql'
     fi
     if [ -z "${DB_HOST}" ]; then
+        echo "Setting default for DB_HOST: 127.0.0.1"
         export DB_HOST='127.0.0.1'
     fi
     if [ -z "${DB_PORT}" ]; then
+        echo "Setting default for DB_PORT: 3306"
         export DB_PORT='3306'
     fi
     if [ -z "${DB_DATABASE}" ]; then
+        echo "Setting default for DB_DATABASE: pixelfed"
         export DB_DATABASE='pixelfed'
     fi
 
     # wait for database
-    if [ "$DB_CONNECTION" == "mysql" ]; then
-      while ! mysqladmin --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USERNAME" --password="$DB_PASSWORD" ping; do
-        echo "Waiting for $DB_CONNECTION database..."
+    if [ "${DB_CONNECTION}" == "mysql" ]; then
+      php-ext.sh enable 'mysqlnd pdo_mysql'
+      while ! mysqladmin --host="${DB_HOST}" --port="${DB_PORT}" --user="${DB_USERNAME}" --password="${DB_PASSWORD}" ping; do
+        echo "Waiting for ${DB_CONNECTION} database..."
         sleep 5
       done
-    elif [ "$DB_CONNECTION" == "pgsql" ]; then
-      echo "Using $DB_CONNECTION database"
-      # to be done
-    elif [ "$DB_CONNECTION" == "sqlite" ]; then
-      echo "Using $DB_CONNECTION database"
-      # nothing to do
+    elif [ "${DB_CONNECTION}" == "pgsql" ]; then
+      php-ext.sh enable 'pgsql pdo_pgsql'
+      echo "Waiting for ${DB_CONNECTION} database..."
+      while ! nc -z "${DB_HOST}" "${DB_PORT}"; do sleep 2; done;
+    elif [ "${DB_CONNECTION}" == "sqlite" ]; then
+      echo "Using ${DB_CONNECTION} database"
+      # nothing to do; don't think it's a good idea to use sqlite
     else
-      echo "ERROR: Invalid database type $DB_CONNECTION"
+      echo "ERROR: Invalid database type ${DB_CONNECTION}"
       exit 128
     fi
     echo "Database ready..."
 }
 
 function initialize() {
-    if [ -n "$TZ" ]; then
-      echo "Setting timezone to $TZ"
-      echo "$TZ" > /etc/TZ
-      ln -sf "/usr/share/zoneinfo/$TZ" /etc/localtime
+    if [ -n "${TZ}" ]; then
+      echo "Setting timezone to ${TZ}"
+      echo "${TZ}" > /etc/TZ
+      ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime
     else
       echo "Timezone is set to $(cat /etc/TZ)"
     fi
@@ -74,7 +80,7 @@ function initialize() {
     if [ ! -f "storage/oauth-private.key" ]; then
         echo "Creating oauth keys..."
         su -c "php artisan passport:keys" project
-        if [ ! "$SKIP_CITIES_IMPORT" == "y" ]; then
+        if [ ! "${SKIP_CITIES_IMPORT}" == "y" ]; then
           echo "Importing cities..."
           su -c "php artisan import:cities" project
         fi

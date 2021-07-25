@@ -1,3 +1,4 @@
 mysql.env
+postgresql.env
 pixelfed.env
 swarm.yml
